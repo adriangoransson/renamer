@@ -8,6 +8,8 @@ renamer from to FILES...
 --dry-run
 --verbose
 --interactive
+
+date/numbering support?
 */
 
 fn main() {
