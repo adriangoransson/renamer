@@ -1,34 +1,13 @@
-use regex::Regex;
-use std::{env, fs};
+use structopt::StructOpt;
 
-/* TODO:
-renamer from to FILES...
--e
---replace-all /g
---dry-run
---verbose
---interactive
-
-date/numbering support?
-*/
+use renamer::{args::Options, run};
+use std::process;
 
 fn main() {
-    let from = env::args()
-        .nth(1)
-        .expect("Expected pattern to be the first argument");
-    let to = env::args()
-        .nth(2)
-        .expect("Expected pattern to be the second argument");
+    let options = Options::from_args();
 
-    let from_re = Regex::new(&from).unwrap();
-
-    for entry in fs::read_dir(".").unwrap() {
-        let dir = entry.unwrap();
-        let file = dir.file_name();
-        let filename = file.to_str().unwrap();
-
-        let rep = from_re.replace(filename, to.as_str());
-
-        println!("{}", rep);
+    if let Err(error) = run(options) {
+        eprintln!("{}", error);
+        process::exit(1);
     }
 }
