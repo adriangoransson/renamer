@@ -2,6 +2,7 @@ use std::{error::Error, path::PathBuf};
 use structopt::StructOpt;
 
 /// Parse a single key-value pair
+// https://github.com/TeXitoi/structopt/blob/master/examples/keyvalue.rs
 fn parse_key_val<T, U>(s: &str) -> Result<(T, U), Box<dyn Error>>
 where
     T: std::str::FromStr,
