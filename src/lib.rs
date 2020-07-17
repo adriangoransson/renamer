@@ -16,14 +16,8 @@ pub fn run(opts: args::Options) -> Result<(), String> {
     let patterns = {
         let mut p = Vec::with_capacity(1 + opts.patterns.len());
 
-        let from = Regex::new(&opts.pattern.0).expect("Invalid regex.");
-
-        p.push((from, &opts.pattern.1));
-        p.extend(
-            opts.patterns
-                .iter()
-                .map(|(f, v)| (Regex::new(f).expect("Invalid regex."), v)),
-        );
+        p.push(opts.pattern);
+        p.extend(opts.patterns);
 
         p
     };
@@ -85,7 +79,7 @@ pub fn run(opts: args::Options) -> Result<(), String> {
 pub fn get_renamed_path<P: AsRef<Path>>(
     path: P,
     replace_all: bool,
-    patterns: &[(Regex, &String)],
+    patterns: &[(Regex, String)],
 ) -> PathBuf {
     let file = path.as_ref().file_name().unwrap();
     let dir = path.as_ref().parent();

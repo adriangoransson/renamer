@@ -1,19 +1,17 @@
+use regex::Regex;
 use std::{error::Error, path::PathBuf};
 use structopt::StructOpt;
 
 /// Parse a single key-value pair
 // https://github.com/TeXitoi/structopt/blob/master/examples/keyvalue.rs
-fn parse_key_val<T, U>(s: &str) -> Result<(T, U), Box<dyn Error>>
-where
-    T: std::str::FromStr,
-    T::Err: Error + 'static,
-    U: std::str::FromStr,
-    U::Err: Error + 'static,
-{
+fn parse_pattern(s: &str) -> Result<(Regex, String), Box<dyn Error>> {
     let pos = s
         .find('=')
         .ok_or_else(|| format!("invalid REGEX=REPLACEMENT: no `=` found in `{}`", s))?;
-    Ok((s[..pos].parse()?, s[pos + 1..].parse()?))
+
+    let pattern = Regex::new(&s[..pos])?;
+
+    Ok((pattern, s[pos + 1..].parse()?))
 }
 
 /* TODO:
@@ -49,12 +47,12 @@ pub struct Options {
     pub ignore_dir: bool,
 
     /// Regex pattern to match and the string to replace it with. (REGEX=REPLACEMENT)
-    #[structopt(required = true, parse(try_from_str = parse_key_val))]
-    pub pattern: (String, String),
+    #[structopt(required = true, parse(try_from_str = parse_pattern))]
+    pub pattern: (Regex, String),
 
     /// Additional patterns. These can be supplied multiple times. Patterns are executed in the order they are passed, starting with the mandatory pattern.
-    #[structopt(short = "e", long = "regexp", parse(try_from_str = parse_key_val), number_of_values = 1)]
-    pub patterns: Vec<(String, String)>,
+    #[structopt(short = "e", long = "regexp", parse(try_from_str = parse_pattern), number_of_values = 1)]
+    pub patterns: Vec<(Regex, String)>,
 
     /// Files to rename.
     #[structopt(required = true)]
