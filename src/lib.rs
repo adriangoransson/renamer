@@ -77,14 +77,14 @@ pub fn run(opts: args::Options) -> Result<(), String> {
             }
 
             count += 1;
-        } else if opts.ignore_dir {
+        } else if opts.ignore_invalid_files {
             if opts.verbose {
-                log(opts.dry_run, format!("Ignoring directory {:?}", path));
+                log(opts.dry_run, format!("Ignoring {:?}", path));
             }
         } else {
             let current = std::env::current_dir().unwrap().join(path);
             return Err(format!(
-                "{:?} is not a file. If this is intentional, pass --ignore-dir.",
+                "{:?} is not a file. If this is intentional, pass --ignore-invalid-files.",
                 current
             ));
         }

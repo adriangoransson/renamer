@@ -53,7 +53,7 @@ pub struct Options {
 
     /// Ignores directories passed to the program as files. Useful for shell globbing.
     #[structopt(long)]
-    pub ignore_dir: bool,
+    pub ignore_invalid_files: bool,
 
     /// Prefix files with an increasing counter in the specified format. E.g. 0501 => 0501filename, 0502filename.
     #[structopt(long, parse(try_from_str = parse_increment))]
