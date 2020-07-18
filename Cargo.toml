@@ -1,6 +1,6 @@
 [package]
 name = "renamer"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Adrian Göransson"]
 edition = "2018"
 description = "A command line tool to rename multiple files at once."
