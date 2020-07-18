@@ -1,10 +1,12 @@
 [package]
 name = "renamer"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Adrian Göransson"]
 edition = "2018"
-description = "Bulk renamer cli tool."
+description = "A command line tool to rename multiple files at once."
 license = "MIT"
+repository = "https://github.com/adriangoransson/renamer"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

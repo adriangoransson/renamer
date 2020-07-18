@@ -8,18 +8,24 @@ A bulk renaming tool for files.
 
 And, uh, it's pretty speedy I guess? I'm hoping it's cross platform too but so far I have only tested it on *nix systems.
 
+## Installation
+
+With [Cargo](https://github.com/rust-lang/cargo/).
+
+    $ cargo install renamer
+
 ## Usage
 
 Add a prefix or a file extension.
 
-    renamer '^=2020-07-18 ' img* # Add a prefix
-    renamer '$=.bak' file1 file2 # Add an extension
+    $ renamer '^=2020-07-18 ' img* # Add a prefix
+    $ renamer '$=.bak' file1 file2 # Add an extension
 
-    renamer 'JPEG$=jpg' *.JPEG   # Change extension
+    $ renamer 'JPEG$=jpg' *.JPEG   # Change extension
 
 Rearrange parts of files. The following describes the various ways to use capture groups, including named groups.
 
-    renamer --verbose '(?P<index>\d{2}\.) (.*)\.(?P<ext>)=${index} Lady Gaga - $2.$ext'
+    $ renamer --verbose '(?P<index>\d{2}\.) (.*)\.(?P<ext>)=${index} Lady Gaga - $2.$ext'
 
     "01. Chromatica I.mp3" -> "01. Lady Gaga - Chromatica I.mp3"
     "02. Alice.mp3" -> "02. Lady Gaga - Alice.mp3"
@@ -39,7 +45,7 @@ Rearrange parts of files. The following describes the various ways to use captur
 
 Add digits to easily sort files. Useful if you were to flatten directory structures but still want your files nicely sorted.
 
-    renamer -v '^=_' --prefix-increment 0201 Westworld01.mkv Westworld.S02E02.mkv Westworld_3.mkv
+    $ renamer -v '^=_' --prefix-increment 0201 Westworld01.mkv Westworld.S02E02.mkv Westworld_3.mkv
 
     "Westworld01.mkv" -> "0201_Westworld01.mkv"
     "Westworld.S02E02.mkv" -> "0202_Westworld.S02E02.mkv"
