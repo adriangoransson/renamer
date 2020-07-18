@@ -16,6 +16,7 @@ pub enum IncrementPosition {
 }
 
 impl FileRenamer {
+    /// Creates a new builder with the received path.
     pub fn new<P: AsRef<Path>>(path: P) -> Self {
         FileRenamer {
             path: path.as_ref().to_owned(),
@@ -38,6 +39,7 @@ impl FileRenamer {
         Ok(s.to_string())
     }
 
+    /// Apply the `regex=replacement` patterns provided to the file name in sequence.
     pub fn apply_patterns(
         &mut self,
         replace_all: bool,
@@ -61,6 +63,11 @@ impl FileRenamer {
         Ok(self)
     }
 
+    /// Takes a position (`{pre,suf}fix`), an Increment struct with the width and starting index.
+    /// The count specifies the current index or amount to add to the starting index.
+    ///
+    /// It will try to respect the naming of hidden files (preceding dot) so that they stay hidden.
+    /// Extensions should also be preserved.
     pub fn increment(
         &mut self,
         position: IncrementPosition,

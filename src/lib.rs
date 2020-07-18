@@ -13,6 +13,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
         return Err(RenameError::InputError(InputError::ForceAndInteractive));
     }
 
+    // Collect all patterns. The mandatory first and extras in order of input.
     let patterns = {
         let mut p = Vec::with_capacity(1 + opts.patterns.len());
 
@@ -22,9 +23,12 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
         p
     };
 
+    // The counter used for increment operations. Incremented for every iteration where a (dry) rename happened.
     let mut count = 0;
+
     for path in &opts.files {
         if path.is_file() {
+            // Apply all renaming operations using a builder.
             let renamed = {
                 let mut r = FileRenamer::new(path);
 
@@ -45,6 +49,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
                 if opts.verbose {
                     log(opts.dry_run, format!("No patterns match {:?}", path));
                 }
+
                 continue;
             }
 
@@ -80,6 +85,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
                 log(opts.dry_run, format!("Ignoring {:?}", path));
             }
         } else {
+            // path is not a file. It might not be a directory either.
             let current = std::env::current_dir()?.join(path);
             return Err(RenameError::InputError(InputError::InvalidFile(current)));
         }

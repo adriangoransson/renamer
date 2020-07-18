@@ -1,5 +1,6 @@
 use std::io::stdin;
 
+//FIXME: remove dependency on stdout
 pub(crate) fn log<S: std::convert::AsRef<str>>(dry_run: bool, message: S) {
     if dry_run {
         print!("DRY ");
