@@ -48,4 +48,4 @@ Add digits to easily sort files. Useful if you were to flatten directory structu
 Also possible to add suffixes with `--prefix-suffix`.
 
 ## Acknowledgements
-Inspired greatly by the original [`rename.pl`](https://metacpan.org/source/PEDERST/rename-1.9/README.md)
+Inspired greatly by the original [`rename.pl`](https://metacpan.org/source/PEDERST/rename-1.9/README.md). The aim is to have similar features but with faster execution time and a slightly more intuitive syntax for those not so familiar with regexes.
