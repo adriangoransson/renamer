@@ -82,20 +82,7 @@ impl FileRenamer {
             width = increment.width
         );
 
-        // Respect hidden files.
-        let start_index = if file_name.starts_with('.') { 1 } else { 0 };
-
-        match position {
-            IncrementPosition::Prefix => file_name.insert_str(start_index, &inc),
-            IncrementPosition::Suffix => {
-                let last_dot = file_name.rfind('.');
-
-                match last_dot {
-                    Some(i) if i > start_index => file_name.insert_str(i, &inc),
-                    _ => file_name.push_str(&inc),
-                }
-            }
-        }
+        file_name = interpolate_increment(file_name, &inc, position);
 
         self.path.set_file_name(file_name);
 
@@ -104,5 +91,42 @@ impl FileRenamer {
 
     pub fn finish(self) -> PathBuf {
         self.path
+    }
+}
+
+fn interpolate_increment(mut name: String, inc: &str, position: IncrementPosition) -> String {
+    // Respect hidden files.
+    let start_index = if name.starts_with('.') { 1 } else { 0 };
+
+    match position {
+        IncrementPosition::Prefix => name.insert_str(start_index, &inc),
+        IncrementPosition::Suffix => {
+            let last_dot = name.rfind('.');
+
+            match last_dot {
+                Some(i) if i > start_index => name.insert_str(i, &inc),
+                _ => name.push_str(&inc),
+            }
+        }
+    }
+
+    name
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{interpolate_increment, IncrementPosition};
+
+    #[test]
+    fn interpolate_hidden() {
+        assert_eq!(
+            ".vimrc123",
+            interpolate_increment(".vimrc".to_string(), "123", IncrementPosition::Suffix)
+        );
+
+        assert_eq!(
+            ".003hidden.ext",
+            interpolate_increment(".hidden.ext".to_string(), "003", IncrementPosition::Prefix)
+        );
     }
 }
