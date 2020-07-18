@@ -7,7 +7,7 @@ fn main() {
     let options = Options::from_args();
 
     if let Err(error) = run(options) {
-        eprintln!("{}", error);
+        eprintln!("{} Exiting.", error);
         process::exit(1);
     }
 }

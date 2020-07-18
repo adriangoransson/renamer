@@ -1,16 +1,16 @@
 pub mod args;
+pub mod errors;
 pub mod file_renamer;
 
 mod term_utils;
 
+use errors::{InputError, RenameError};
 use file_renamer::{FileRenamer, IncrementPosition};
 use term_utils::{ask_for_confirmation, log};
 
-pub fn run(opts: args::Options) -> Result<(), String> {
+pub fn run(opts: args::Options) -> Result<(), RenameError> {
     if opts.force && opts.interactive {
-        return Err(
-            "Received --force and --interactive. Not sure how to continue. Exiting.".to_string(),
-        );
+        return Err(RenameError::InputError(InputError::ForceAndInteractive));
     }
 
     let patterns = {
@@ -28,14 +28,14 @@ pub fn run(opts: args::Options) -> Result<(), String> {
             let renamed = {
                 let mut r = FileRenamer::new(path);
 
-                r.apply_patterns(opts.global, &patterns);
+                r.apply_patterns(opts.global, &patterns)?;
 
                 if let Some(prefix_increment) = opts.prefix_increment {
-                    r.increment(IncrementPosition::Prefix, prefix_increment, count);
+                    r.increment(IncrementPosition::Prefix, prefix_increment, count)?;
                 }
 
                 if let Some(suffix_increment) = opts.suffix_increment {
-                    r.increment(IncrementPosition::Suffix, suffix_increment, count);
+                    r.increment(IncrementPosition::Suffix, suffix_increment, count)?;
                 }
 
                 r.finish()
@@ -49,22 +49,20 @@ pub fn run(opts: args::Options) -> Result<(), String> {
             }
 
             if renamed.is_dir() {
-                return Err(format!(
-                    "Cannot rename {:?}. {:?} is already a directory.",
-                    path, renamed
+                return Err(RenameError::InputError(
+                    InputError::CannotRenameFileToDirectory(path.to_owned(), renamed),
                 ));
             }
 
             if renamed.is_file() {
                 if opts.interactive {
-                    if !ask_for_confirmation(format!("Overwrite {:?}?", renamed)) {
+                    if !ask_for_confirmation(format!("Overwrite {:?}?", renamed))? {
                         continue;
                     }
                 } else if !opts.force {
-                    return Err(format!(
-                        "Not overwriting {:?} without --interactive or --force",
+                    return Err(RenameError::InputError(InputError::SkippingOverwrite(
                         renamed,
-                    ));
+                    )));
                 }
             }
 
@@ -73,7 +71,7 @@ pub fn run(opts: args::Options) -> Result<(), String> {
             }
 
             if !opts.dry_run {
-                std::fs::rename(path, renamed).expect("Failed to rename file");
+                std::fs::rename(path, renamed)?;
             }
 
             count += 1;
@@ -82,11 +80,8 @@ pub fn run(opts: args::Options) -> Result<(), String> {
                 log(opts.dry_run, format!("Ignoring {:?}", path));
             }
         } else {
-            let current = std::env::current_dir().unwrap().join(path);
-            return Err(format!(
-                "{:?} is not a file. If this is intentional, pass --ignore-invalid-files.",
-                current
-            ));
+            let current = std::env::current_dir()?.join(path);
+            return Err(RenameError::InputError(InputError::InvalidFile(current)));
         }
     }
 

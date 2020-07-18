@@ -8,11 +8,13 @@ pub(crate) fn log<S: std::convert::AsRef<str>>(dry_run: bool, message: S) {
     println!("{}", message.as_ref());
 }
 
-pub(crate) fn ask_for_confirmation<S: std::convert::AsRef<str>>(message: S) -> bool {
+pub(crate) fn ask_for_confirmation<S: std::convert::AsRef<str>>(
+    message: S,
+) -> std::io::Result<bool> {
     eprint!("{} [y/N] ", message.as_ref());
     let mut input = String::new();
 
-    stdin().read_line(&mut input).expect("Failed to lock stdin");
+    stdin().read_line(&mut input)?;
 
-    input.trim().to_lowercase() == "y"
+    Ok(input.trim().to_lowercase() == "y")
 }

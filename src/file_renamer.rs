@@ -1,6 +1,9 @@
-use crate::args::Increment;
+use crate::{args::Increment, errors::RenameError};
 use regex::Regex;
-use std::path::{Path, PathBuf};
+use std::{
+    io,
+    path::{Path, PathBuf},
+};
 
 pub struct FileRenamer {
     pub path: PathBuf,
@@ -19,15 +22,34 @@ impl FileRenamer {
         }
     }
 
-    pub fn apply_patterns(&mut self, replace_all: bool, patterns: &[(Regex, String)]) -> &mut Self {
+    fn file_name(&self) -> io::Result<String> {
+        let name = self
+            .path
+            .file_name()
+            .expect("FileRenamer was created with an invalid file.");
+
+        let s = name.to_str().ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::Other,
+                format!("File name {:?} contains invalid UTF-8.", name),
+            )
+        })?;
+
+        Ok(s.to_string())
+    }
+
+    pub fn apply_patterns(
+        &mut self,
+        replace_all: bool,
+        patterns: &[(Regex, String)],
+    ) -> Result<&mut Self, RenameError> {
         let replace = if replace_all {
             Regex::replace_all
         } else {
             Regex::replace
         };
 
-        // FIXME: holy guacamole.
-        let mut file_name = self.path.file_name().unwrap().to_str().unwrap().to_string();
+        let mut file_name = self.file_name()?;
 
         for (regex, replacement) in patterns {
             let rep = replacement.as_str();
@@ -36,7 +58,7 @@ impl FileRenamer {
 
         self.path.set_file_name(file_name);
 
-        self
+        Ok(self)
     }
 
     pub fn increment(
@@ -44,9 +66,8 @@ impl FileRenamer {
         position: IncrementPosition,
         increment: Increment,
         count: usize,
-    ) -> &mut Self {
-        // FIXME: bleh.
-        let mut file_name = self.path.file_name().unwrap().to_str().unwrap().to_string();
+    ) -> Result<&mut Self, RenameError> {
+        let mut file_name = self.file_name()?;
 
         let inc = format!(
             "{:0width$}",
@@ -71,7 +92,7 @@ impl FileRenamer {
 
         self.path.set_file_name(file_name);
 
-        self
+        Ok(self)
     }
 
     pub fn finish(self) -> PathBuf {
