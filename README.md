@@ -25,7 +25,7 @@ Add a prefix or a file extension.
 
 Rearrange parts of files. The following describes the various ways to use capture groups, including named groups.
 
-    $ renamer --verbose '(?P<index>\d{2}\.) (.*)\.(?P<ext>)=${index} Lady Gaga - $2.$ext'
+    $ renamer --verbose '(?P<index>\d{2}\.) (.*)\.(?P<ext>)=${index} Lady Gaga - $2.$ext' *.mp3
 
     "01. Chromatica I.mp3" -> "01. Lady Gaga - Chromatica I.mp3"
     "02. Alice.mp3" -> "02. Lady Gaga - Alice.mp3"
