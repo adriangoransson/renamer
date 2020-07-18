@@ -1,9 +1,9 @@
-use regex::Regex;
-use std::path::{Path, PathBuf};
-
 pub mod args;
+pub mod file_renamer;
+
 mod term_utils;
 
+use file_renamer::FileRenamer;
 use term_utils::{ask_for_confirmation, log};
 
 pub fn run(opts: args::Options) -> Result<(), String> {
@@ -24,7 +24,13 @@ pub fn run(opts: args::Options) -> Result<(), String> {
 
     for path in &opts.files {
         if path.is_file() {
-            let renamed = get_renamed_path(path, opts.global, &patterns);
+            let renamed = {
+                let mut r = FileRenamer::new(path);
+
+                r.apply_patterns(opts.global, &patterns);
+
+                r.finish()
+            };
 
             if path == &renamed {
                 if opts.verbose {
@@ -74,26 +80,4 @@ pub fn run(opts: args::Options) -> Result<(), String> {
     }
 
     Ok(())
-}
-
-pub fn get_renamed_path<P: AsRef<Path>>(
-    path: P,
-    replace_all: bool,
-    patterns: &[(Regex, String)],
-) -> PathBuf {
-    let file = path.as_ref().file_name().unwrap();
-    let dir = path.as_ref().parent();
-    let mut filename = file.to_str().unwrap().to_string(); // There's got to be a nicer way to do this.
-
-    let replace = if replace_all {
-        Regex::replace_all
-    } else {
-        Regex::replace
-    };
-
-    for (regex, replacement) in patterns {
-        filename = replace(regex, &filename, replacement.as_str()).to_string();
-    }
-
-    dir.unwrap().join(filename)
 }
