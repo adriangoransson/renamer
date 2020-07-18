@@ -1,9 +1,16 @@
+use crate::args::Increment;
 use regex::Regex;
 use std::path::{Path, PathBuf};
 
 pub struct FileRenamer {
     pub dir: PathBuf,
     pub filename: String,
+}
+
+#[derive(Debug)]
+pub enum IncrementPosition {
+    Prefix,
+    Suffix,
 }
 
 impl FileRenamer {
@@ -24,6 +31,31 @@ impl FileRenamer {
 
         for (regex, replacement) in patterns {
             self.filename = replace(regex, &self.filename, replacement.as_str()).to_string();
+        }
+
+        self
+    }
+
+    pub fn increment(
+        &mut self,
+        position: IncrementPosition,
+        increment: Increment,
+        count: usize,
+    ) -> &mut Self {
+        let inc = format!(
+            "{:0width$}",
+            increment.start + count,
+            width = increment.width
+        );
+        match position {
+            IncrementPosition::Prefix => self.filename.insert_str(0, &inc),
+            IncrementPosition::Suffix => {
+                if let Some(index) = self.filename.rfind('.') {
+                    self.filename.insert_str(index, &inc);
+                } else {
+                    self.filename.push_str(&inc)
+                }
+            }
         }
 
         self

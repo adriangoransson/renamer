@@ -14,10 +14,19 @@ fn parse_pattern(s: &str) -> Result<(Regex, String), Box<dyn Error>> {
     Ok((pattern, s[pos + 1..].parse()?))
 }
 
-/* TODO:
-date/numbering support?
-{pre,suf}fix?
-*/
+fn parse_increment(s: &str) -> Result<Increment, Box<dyn Error>> {
+    Ok(Increment {
+        width: s.len(),
+        start: s.parse()?,
+    })
+}
+
+// TODO: string patterns (like "005-" or "_01") around increment.
+#[derive(Debug, Copy, Clone)]
+pub struct Increment {
+    pub width: usize,
+    pub start: usize,
+}
 
 #[derive(Debug, StructOpt)]
 #[structopt(author, about)]
@@ -45,6 +54,14 @@ pub struct Options {
     /// Ignores directories passed to the program as files. Useful for shell globbing.
     #[structopt(long)]
     pub ignore_dir: bool,
+
+    /// Prefix files with an increasing counter in the specified format. E.g. 0501 => 0501filename, 0502filename.
+    #[structopt(long, parse(try_from_str = parse_increment))]
+    pub prefix_increment: Option<Increment>,
+
+    /// See --prefix-increment. Will try to insert suffix before the file extension.
+    #[structopt(long, parse(try_from_str = parse_increment))]
+    pub suffix_increment: Option<Increment>,
 
     /// Regex pattern to match and the string to replace it with. (REGEX=REPLACEMENT)
     #[structopt(required = true, parse(try_from_str = parse_pattern))]
