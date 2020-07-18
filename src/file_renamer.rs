@@ -3,8 +3,7 @@ use regex::Regex;
 use std::path::{Path, PathBuf};
 
 pub struct FileRenamer {
-    pub dir: PathBuf,
-    pub filename: String,
+    pub path: PathBuf,
 }
 
 #[derive(Debug)]
@@ -15,11 +14,9 @@ pub enum IncrementPosition {
 
 impl FileRenamer {
     pub fn new<P: AsRef<Path>>(path: P) -> Self {
-        let file = path.as_ref().file_name().unwrap();
-        let dir = path.as_ref().parent().unwrap().to_owned();
-        let filename = file.to_str().unwrap().to_string();
-
-        FileRenamer { dir, filename }
+        FileRenamer {
+            path: path.as_ref().to_owned(),
+        }
     }
 
     pub fn apply_patterns(&mut self, replace_all: bool, patterns: &[(Regex, String)]) -> &mut Self {
@@ -29,9 +26,15 @@ impl FileRenamer {
             Regex::replace
         };
 
+        // FIXME: holy guacamole.
+        let mut file_name = self.path.file_name().unwrap().to_str().unwrap().to_string();
+
         for (regex, replacement) in patterns {
-            self.filename = replace(regex, &self.filename, replacement.as_str()).to_string();
+            let rep = replacement.as_str();
+            file_name = replace(regex, &file_name, rep).to_string();
         }
+
+        self.path.set_file_name(file_name);
 
         self
     }
@@ -42,26 +45,36 @@ impl FileRenamer {
         increment: Increment,
         count: usize,
     ) -> &mut Self {
+        // FIXME: bleh.
+        let mut file_name = self.path.file_name().unwrap().to_str().unwrap().to_string();
+
         let inc = format!(
             "{:0width$}",
             increment.start + count,
             width = increment.width
         );
+
+        // Respect hidden files.
+        let start_index = if file_name.starts_with('.') { 1 } else { 0 };
+
         match position {
-            IncrementPosition::Prefix => self.filename.insert_str(0, &inc),
+            IncrementPosition::Prefix => file_name.insert_str(start_index, &inc),
             IncrementPosition::Suffix => {
-                if let Some(index) = self.filename.rfind('.') {
-                    self.filename.insert_str(index, &inc);
-                } else {
-                    self.filename.push_str(&inc)
+                let last_dot = file_name.rfind('.');
+
+                match last_dot {
+                    Some(i) if i > start_index => file_name.insert_str(i, &inc),
+                    _ => file_name.push_str(&inc),
                 }
             }
         }
+
+        self.path.set_file_name(file_name);
 
         self
     }
 
     pub fn finish(self) -> PathBuf {
-        self.dir.join(self.filename)
+        self.path
     }
 }
