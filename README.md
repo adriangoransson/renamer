@@ -16,12 +16,50 @@ With [Cargo](https://github.com/rust-lang/cargo/).
 
 ## Usage
 
+    USAGE:
+        renamer [FLAGS] [OPTIONS] <pattern> <files>...
+
+    FLAGS:
+        -d, --dry-run                 Perform a dry-run. Do everything but the actual renaming
+        -f, --force                   Do not exit or ask for confirmation when overwriting files
+        -g, --global                  Test the regular expression against all possible matches instead of only the first
+        -h, --help                    Prints help information
+            --ignore-invalid-files    Ignores directories passed to the program as files. Useful for shell globbing
+        -i, --interactive             Ask for confirmation before overwrite. The program will otherwise exit unless --force
+                                    is passed
+        -V, --version                 Prints version information
+        -v, --verbose                 Print operations as they are being performed
+
+    OPTIONS:
+        -e, --regexp <patterns>...
+                Additional patterns. These can be supplied multiple times. Patterns are executed in the order they are
+                passed, starting with the mandatory pattern
+            --prefix-increment <prefix-increment>
+                Prefix files with an increasing counter in the specified format. E.g. 0501 => 0501filename, 0502filename
+
+            --suffix-increment <suffix-increment>
+                See --prefix-increment. Will try to insert suffix before the file extension
+
+
+    ARGS:
+        <pattern>     Regex pattern to match and the string to replace it with. (REGEX=REPLACEMENT)
+        <files>...    Files to rename
+
+## Examples
+
 Add a prefix or a file extension.
 
-    $ renamer '^=2020-07-18 ' img* # Add a prefix
-    $ renamer '$=.bak' file1 file2 # Add an extension
+    # Add a prefix
+    $ renamer '^=2020-07-18 ' img*
 
-    $ renamer 'JPEG$=jpg' *.JPEG   # Change extension
+    # Add an extension
+    $ renamer '$=.bak' file1 file2
+
+    # Change extension
+    $ renamer 'JPEG$=jpg' *.JPEG
+
+    # Multiple patterns. Change extension and remove a prefix.
+    $ renamer 'JPEG$=jpg' -e '^some_prefix_=' *
 
 Rearrange parts of files. The following describes the various ways to use capture groups, including named groups.
 
