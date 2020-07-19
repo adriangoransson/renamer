@@ -10,6 +10,8 @@ And, uh, it's pretty speedy I guess? I'm hoping it's cross platform too but so f
 
 ## Installation
 
+Have a look at the [releases page](https://github.com/adriangoransson/renamer/releases) for pre-built binaries.
+
 With [Cargo](https://github.com/rust-lang/cargo/).
 
     $ cargo install renamer
