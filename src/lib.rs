@@ -72,6 +72,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
                     }
                 } else if !opts.force {
                     return Err(RenameError::InputError(InputError::SkippingOverwrite(
+                        path.to_owned(),
                         renamed,
                     )));
                 }

@@ -17,8 +17,8 @@ pub enum InputError {
     /// Cannot rename `file`. `directory` is already a directory.
     CannotRenameFileToDirectory(PathBuf, PathBuf),
 
-    /// Not overwriting `file` without --interactive or --force.
-    SkippingOverwrite(PathBuf),
+    /// `file`. Not overwriting `file` without --interactive or --force.
+    SkippingOverwrite(PathBuf, PathBuf),
 
     /// `path` is not a file. If this is intentional, pass --ignore-invalid-files.
     InvalidFile(PathBuf),
@@ -36,9 +36,9 @@ impl Display for RenameError {
                         "Cannot rename {:?}. {:?} is already a directory.",
                         file, dir
                     ),
-                    InputError::SkippingOverwrite(file) => format!(
-                        "Not overwriting {:?} without --interactive or --force.",
-                        file,
+                    InputError::SkippingOverwrite(file, renamed) => format!(
+                        "{:?}. Not overwriting {:?} without --interactive or --force.",
+                        file, renamed,
                     ),
                     InputError::InvalidFile(path) => format!(
                         "{:?} is not a file. If this is intentional, pass --ignore-invalid-files.",
