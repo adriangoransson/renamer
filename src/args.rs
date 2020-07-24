@@ -35,7 +35,7 @@ pub struct Options {
     #[structopt(short, long)]
     pub global: bool,
 
-    /// Perform a dry-run. Do everything but the actual renaming.
+    /// Perform a dry-run. Do everything but the actual renaming. Implies verbose.
     #[structopt(short, long)]
     pub dry_run: bool,
 

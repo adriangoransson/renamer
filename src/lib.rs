@@ -13,6 +13,8 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
         return Err(RenameError::InputError(InputError::ForceAndInteractive));
     }
 
+    let verbose = opts.verbose || opts.dry_run;
+
     // Collect all patterns. The mandatory first and extras in order of input.
     let patterns = {
         let mut p = Vec::with_capacity(1 + opts.patterns.len());
@@ -46,7 +48,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
             };
 
             if path == &renamed {
-                if opts.verbose {
+                if verbose {
                     log(opts.dry_run, format!("No patterns match {:?}", path));
                 }
 
@@ -71,7 +73,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
                 }
             }
 
-            if opts.verbose || opts.dry_run {
+            if verbose {
                 log(opts.dry_run, format!("{:?} -> {:?}", path, renamed));
             }
 
@@ -81,7 +83,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
 
             count += 1;
         } else if opts.ignore_invalid_files {
-            if opts.verbose {
+            if verbose {
                 log(opts.dry_run, format!("Ignoring {:?}", path));
             }
         } else {
