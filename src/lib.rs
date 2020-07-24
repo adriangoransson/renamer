@@ -6,6 +6,7 @@ mod term_utils;
 
 use errors::{InputError, RenameError};
 use file_renamer::{FileRenamer, IncrementPosition};
+use std::collections::HashSet;
 use term_utils::{ask_for_confirmation, log};
 
 pub fn run(opts: args::Options) -> Result<(), RenameError> {
@@ -24,6 +25,9 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
 
         p
     };
+
+    // Dry run: keep track of unavailable file names.
+    let mut paths = HashSet::new();
 
     // The counter used for increment operations. Incremented for every iteration where a (dry) rename happened.
     let mut count = 0;
@@ -61,7 +65,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
                 ));
             }
 
-            if renamed.is_file() {
+            if renamed.is_file() || paths.contains(&renamed) {
                 if opts.interactive {
                     if !ask_for_confirmation(format!("Overwrite {:?}?", renamed))? {
                         continue;
@@ -77,7 +81,9 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
                 log(opts.dry_run, format!("{:?} -> {:?}", path, renamed));
             }
 
-            if !opts.dry_run {
+            if opts.dry_run {
+                paths.insert(renamed);
+            } else {
                 std::fs::rename(path, renamed)?;
             }
 
