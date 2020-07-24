@@ -2,6 +2,7 @@ use renamer::{args::Options, run};
 
 #[test]
 fn no_force_and_interactive() {
+    #[allow(clippy::trivial_regex)]
     let result = run(Options {
         global: true,
         dry_run: true,
