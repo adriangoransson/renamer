@@ -59,7 +59,20 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
                 continue;
             }
 
-            if renamed.file_stem().is_none() {
+            if let Some(name) = renamed.file_stem() {
+                let was_hidden = path
+                    .file_stem()
+                    .unwrap_or_else(|| panic!("No file stem for {:?}?", path))
+                    .to_string_lossy()
+                    .starts_with('.');
+
+                if !was_hidden && name.to_string_lossy().starts_with('.') {
+                    log(
+                        opts.dry_run,
+                        format!("WARN: {:?} got prefix '.' and might be hidden.", renamed),
+                    );
+                }
+            } else {
                 return Err(RenameError::InputError(InputError::InvalidRename(
                     path.to_owned(),
                     renamed,
