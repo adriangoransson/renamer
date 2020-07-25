@@ -22,6 +22,9 @@ pub enum InputError {
 
     /// `path` is not a file. If this is intentional, pass --ignore-invalid-files.
     InvalidFile(PathBuf),
+
+    /// Invalid rename. `file` can't be renamed to `file`.
+    InvalidRename(PathBuf, PathBuf),
 }
 
 impl Display for RenameError {
@@ -43,6 +46,10 @@ impl Display for RenameError {
                     InputError::InvalidFile(path) => format!(
                         "{:?} is not a file. If this is intentional, pass --ignore-invalid-files.",
                         path
+                    ),
+                    InputError::InvalidRename(path, renamed) => format!(
+                        "Invalid rename. {:?} can't be renamed to {:?}.",
+                        path, renamed
                     ),
                 };
 

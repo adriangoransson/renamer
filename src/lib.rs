@@ -59,6 +59,13 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
                 continue;
             }
 
+            if renamed.file_stem().is_none() {
+                return Err(RenameError::InputError(InputError::InvalidRename(
+                    path.to_owned(),
+                    renamed,
+                )));
+            }
+
             if renamed.is_dir() {
                 return Err(RenameError::InputError(
                     InputError::CannotRenameFileToDirectory(path.to_owned(), renamed),
