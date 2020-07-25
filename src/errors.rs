@@ -55,7 +55,7 @@ impl Display for RenameError {
 
                 write!(f, "{}", out)
             }
-            RenameError::Io(err) => writeln!(f, "IO error {}", err),
+            RenameError::Io(err) => write!(f, "IO error {}", err),
         }
     }
 }
