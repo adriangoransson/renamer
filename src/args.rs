@@ -55,7 +55,7 @@ pub struct Options {
     #[structopt(long)]
     pub ignore_invalid_files: bool,
 
-    /// Prefix files with an increasing counter in the specified format. E.g. 0501 => 0501filename, 0502filename.
+    /// Prefix files with an increasing counter in the specified format. E.g. 0501 => 0501filename, 0502filename. Applied after pattern replacements.
     #[structopt(long, parse(try_from_str = parse_increment))]
     pub prefix_increment: Option<Increment>,
 
