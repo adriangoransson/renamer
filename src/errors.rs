@@ -36,20 +36,20 @@ impl Display for RenameError {
                         "Received --force and --interactive. Not sure how to continue.".to_string()
                     }
                     InputError::CannotRenameFileToDirectory(file, dir) => format!(
-                        "Cannot rename {:?}. {:?} is already a directory.",
-                        file, dir
+                        "Cannot rename {}. {} is already a directory.",
+                        file.display(), dir.display()
                     ),
                     InputError::SkippingOverwrite(file, renamed) => format!(
-                        "{:?}. Not overwriting {:?} without --interactive or --force.",
-                        file, renamed,
+                        "{}. Not overwriting {} without --interactive or --force.",
+                        file.display(), renamed.display(),
                     ),
                     InputError::InvalidFile(path) => format!(
-                        "{:?} is not a file. If this is intentional, pass --ignore-invalid-files.",
-                        path
+                        "{} is not a file. If this is intentional, pass --ignore-invalid-files.",
+                        path.display()
                     ),
                     InputError::InvalidRename(path, renamed) => format!(
-                        "Invalid rename. {:?} can't be renamed to {:?}.",
-                        path, renamed
+                        "Invalid rename. {} can't be renamed to {}.",
+                        path.display(), renamed.display()
                     ),
                 };
 

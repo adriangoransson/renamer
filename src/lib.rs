@@ -53,7 +53,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
 
             if path == &renamed {
                 if verbose {
-                    log(opts.dry_run, format!("No patterns match {:?}", path));
+                    log(opts.dry_run, format!("No patterns match {}", path.display()));
                 }
 
                 continue;
@@ -62,14 +62,14 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
             if let Some(name) = renamed.file_stem() {
                 let was_hidden = path
                     .file_stem()
-                    .unwrap_or_else(|| panic!("No file stem for {:?}?", path))
+                    .unwrap_or_else(|| panic!("No file stem for {}?", path.display()))
                     .to_string_lossy()
                     .starts_with('.');
 
                 if !was_hidden && name.to_string_lossy().starts_with('.') {
                     log(
                         opts.dry_run,
-                        format!("WARN: {:?} got prefix '.' and might be hidden.", renamed),
+                        format!("WARN: {} got prefix '.' and might be hidden.", renamed.display()),
                     );
                 }
             } else {
@@ -87,7 +87,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
 
             if renamed.is_file() || paths.contains(&renamed) {
                 if opts.interactive {
-                    if !ask_for_confirmation(format!("Overwrite {:?}?", renamed))? {
+                    if !ask_for_confirmation(format!("Overwrite {}?", renamed.display()))? {
                         continue;
                     }
                 } else if !opts.force {
@@ -99,7 +99,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
             }
 
             if verbose {
-                log(opts.dry_run, format!("{:?} -> {:?}", path, renamed));
+                log(opts.dry_run, format!("{} -> {}", path.display(), renamed.display()));
             }
 
             if opts.dry_run {
@@ -111,7 +111,7 @@ pub fn run(opts: args::Options) -> Result<(), RenameError> {
             count += 1;
         } else if opts.ignore_invalid_files {
             if verbose {
-                log(opts.dry_run, format!("Ignoring {:?}", path));
+                log(opts.dry_run, format!("Ignoring {}", path.display()));
             }
         } else {
             // path is not a file. It might not be a directory either.
